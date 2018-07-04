@@ -60,7 +60,7 @@ public class ThingyMcConfig {
         List<ScanResult> scanResults = wifiManager.getScanResults();
         for (ScanResult sr : scanResults) {
             if (isAThingy(sr)) {
-                thingies.add(new Thingy(sr.SSID));
+                thingies.add(Thingy.from(sr));
             }
         }
         return thingies;
