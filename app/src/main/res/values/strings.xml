@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">thingymcconfig-android</string>
+    <string name="app_name">ThingyMcConfig</string>
+    <string name="configure">Configure</string>
 </resources>

@@ -1,25 +1,80 @@
 package jp.thingy.thingymcconfig;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.util.Log;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.thingy.thingymcconfig.model.ScanResponse;
 import jp.thingy.thingymcconfig.model.Thingy;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ThingyMcConfig {
 
-    private WifiManager wifiManager;
+    private static final String TAG = ThingyMcConfig.class.getSimpleName();
 
-    public ThingyMcConfig(Context context) {
-        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+    private final WifiManager wifiManager;
+    private final String ssidPrefix;
+    private final ThingyMcConfigService service;
+    private boolean wantToBeConnected;
+    private Thingy selectedThingy;
+    private int networkId;
+    private IntentFilter wifiStateChangeIntentFilter =
+            new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+
+    private BroadcastReceiver wifiStateChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            if (wifiInfo != null) {
+                Log.d(TAG, String.format("Connected to %s(%s)", wifiInfo.getSSID(),
+                        wifiInfo.getBSSID()));
+            }
+        }
+    };
+
+    /**
+     * @param context
+     * @param ssidPrefix
+     */
+    public ThingyMcConfig(Context context, String ssidPrefix) {
+        wifiManager = (WifiManager) context.getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
+        this.ssidPrefix = ssidPrefix;
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://10.0.0.1:1338")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        service = retrofit.create(ThingyMcConfigService.class);
+
+        context.registerReceiver(wifiStateChangeReceiver, wifiStateChangeIntentFilter);
+    }
+
+    private String wrapString(String ssid) {
+        return String.format("\"%s\"", ssid);
     }
 
     private boolean isAThingy(ScanResult scanResult) {
+        if (ssidPrefix != null && scanResult.SSID.startsWith(ssidPrefix))
+            return true;
+
         Field ieArrayField;
         try {
             ieArrayField = ScanResult.class.getDeclaredField("informationElements");
@@ -64,5 +119,62 @@ public class ThingyMcConfig {
             }
         }
         return thingies;
+    }
+
+    public boolean connectToThingy(@NonNull Thingy thingy) {
+        if (thingy == null)
+            throw new IllegalArgumentException("thingy cannot be null");
+
+        selectedThingy = thingy;
+        wantToBeConnected = true;
+
+        boolean networkExists = false;
+        List<WifiConfiguration> networks = wifiManager.getConfiguredNetworks();
+        for (WifiConfiguration wc : networks) {
+            if (TextUtils.equals(wc.SSID, wrapString(thingy.ssid))) {
+                Log.d(TAG, "network configuration already exists");
+                networkId = wc.networkId;
+                networkExists = true;
+                break;
+            }
+        }
+
+        if (!networkExists) {
+            WifiConfiguration wifiConfiguration = new WifiConfiguration();
+            wifiConfiguration.SSID = wrapString(thingy.ssid);
+            wifiConfiguration.preSharedKey = wrapString("reallysecurepassword");
+            networkId = wifiManager.addNetwork(wifiConfiguration);
+            if (networkId == -1) {
+                Log.d(TAG, "failed to add network configuration");
+            }
+        }
+
+        wifiManager.enableNetwork(networkId, true);
+
+        return false;
+    }
+
+    public void disconnectFromThingy() {
+        wantToBeConnected = false;
+        selectedThingy = null;
+        wifiManager.removeNetwork(networkId);
+        networkId = -1;
+    }
+
+    public List<ScanResponse.ThingyScanResult> scan() throws IOException {
+        Response<ScanResponse> response = service.scan().execute();
+        return response.body().scanresults;
+    }
+
+    public void config(String ssid, String password) {
+
+    }
+
+    public void getStatus() {
+        try {
+            service.status().execute();
+        } catch (IOException ioe) {
+
+        }
     }
 }
