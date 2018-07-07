@@ -9,6 +9,8 @@ import dagger.Module;
 import dagger.Provides;
 import jp.thingy.thingymcconfig.ThingyMcConfig;
 import jp.thingy.thingymcconfig_android.activity.MainActivity;
+import jp.thingy.thingymcconfig_android.viewmodel.ConfigProgressViewModel;
+import jp.thingy.thingymcconfig_android.viewmodel.ConfigurationViewModel;
 import jp.thingy.thingymcconfig_android.viewmodel.NetworkSelectViewModel;
 
 public class ThingyMcConfigApplication extends Application {
@@ -37,6 +39,10 @@ public class ThingyMcConfigApplication extends Application {
         void inject(MainActivity activity);
 
         void inject(NetworkSelectViewModel viewModel);
+
+        void inject(ConfigurationViewModel viewModel);
+
+        void inject(ConfigProgressViewModel viewModel);
     }
 
     @Override

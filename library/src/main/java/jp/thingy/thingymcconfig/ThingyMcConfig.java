@@ -18,7 +18,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.thingy.thingymcconfig.model.ConfigRequest;
+import jp.thingy.thingymcconfig.model.ConfigResponse;
 import jp.thingy.thingymcconfig.model.ScanResponse;
+import jp.thingy.thingymcconfig.model.StatusResponse;
 import jp.thingy.thingymcconfig.model.Thingy;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -166,15 +169,14 @@ public class ThingyMcConfig {
         return response.body().scanresults;
     }
 
-    public void config(String ssid, String password) {
-
+    public ConfigResponse config(String ssid, String password) throws IOException {
+        ConfigRequest configRequest = new ConfigRequest(ssid, password);
+        Response<ConfigResponse> response = service.config(configRequest).execute();
+        return response.body();
     }
 
-    public void getStatus() {
-        try {
-            service.status().execute();
-        } catch (IOException ioe) {
-
-        }
+    public StatusResponse status() throws IOException {
+        Response<StatusResponse> response = service.status().execute();
+        return response.body();
     }
 }

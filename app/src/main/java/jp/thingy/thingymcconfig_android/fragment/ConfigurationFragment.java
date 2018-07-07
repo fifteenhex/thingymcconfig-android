@@ -53,7 +53,8 @@ public class ConfigurationFragment extends ViewModelFragment<FragmentConfigurati
                 getFragmentManager()
                         .beginTransaction()
                         .addToBackStack(null)
-                        .replace(R.id.fragmentcontainer, ConfigProgressFragment.newInstance())
+                        .replace(R.id.fragmentcontainer, ConfigProgressFragment
+                                .newInstance(viewModel.configuration.ssid, viewModel.configuration.password))
                         .commit();
             }
         });

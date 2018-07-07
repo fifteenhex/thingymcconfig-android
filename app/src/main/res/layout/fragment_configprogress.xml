@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
         <variable
             name="viewModel"
-            type="jp.thingy.thingymcconfig_android.viewmodel.ConfigurationViewModel"/>
+            type="jp.thingy.thingymcconfig_android.viewmodel.ConfigProgressViewModel"/>
     </data>
 
     <LinearLayout
@@ -14,5 +14,57 @@
         android:layout_height="match_parent"
         android:layout_margin="@dimen/margin"
         android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin">
+
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sending configuration..."
+                android:textAppearance="?android:textAppearanceMedium"/>
+
+            <include
+                layout="@layout/snippet_configstagestatus"
+                app:status="@{viewModel.progress.configuration}"/>
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin">
+
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Waiting for supplicant to connect..."
+                android:textAppearance="?android:textAppearanceMedium"/>
+
+            <include
+                layout="@layout/snippet_configstagestatus"
+                app:status="@{viewModel.progress.supplicant}"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Waiting for DHCP4 configuration..."
+                android:textAppearance="?android:textAppearanceMedium"/>
+
+            <include
+                layout="@layout/snippet_configstagestatus"
+                app:status="@{viewModel.progress.dhcp4}"/>
+        </LinearLayout>
+
     </LinearLayout>
 </layout>

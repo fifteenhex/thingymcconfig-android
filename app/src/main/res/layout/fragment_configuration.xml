@@ -35,6 +35,12 @@
             android:paddingTop="@dimen/margin"
             android:text="Select Network"/>
 
+        <android.support.v7.widget.AppCompatCheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@={viewModel.configuration.hiddenSSID}"
+            android:text="Hidden SSID"/>
+
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -42,9 +48,11 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:enabled="false"
-                android:hint="SSID"/>
+                android:enabled="@{viewModel.configuration.hiddenSSID}"
+                android:hint="SSID"
+                android:text="@={viewModel.configuration.ssid}"/>
         </android.support.design.widget.TextInputLayout>
+
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -56,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Password"
                 android:inputType="textPassword"
-                android:text="@={viewModel.password}"/>
+                android:text="@={viewModel.configuration.password}"/>
         </android.support.design.widget.TextInputLayout>
 
         <View
@@ -67,7 +75,7 @@
         <android.support.v7.widget.AppCompatButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="@{viewModel.canConfigure()}"
+            android:enabled="@{viewModel.configuration.configurable}"
             android:onClick="@{() -> listener.onConfigure()}"
             android:text="@string/configure"/>
     </LinearLayout>

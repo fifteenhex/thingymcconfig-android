@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View"/>
+
+        <import type="jp.thingy.thingymcconfig_android.viewmodel.ConfigProgressViewModel.Status"/>
+
+        <variable
+            name="status"
+            type="Status"/>
+    </data>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Done"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:visibility="@{status == Status.OK ? View.VISIBLE : View.INVISIBLE}"
+            tools:visibility="invisible"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Failed"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:visibility="@{status == Status.FAILED ? View.VISIBLE : View.INVISIBLE}"
+            tools:visibility="invisible"/>
+    </FrameLayout>
+</layout>
