@@ -171,12 +171,9 @@ public class ThingyMcConfig {
         return thingies;
     }
 
-    public boolean connectToThingy(@NonNull Thingy thingy) {
+    public boolean setSelectedThingy(@NonNull Thingy thingy) {
         if (thingy == null)
             throw new IllegalArgumentException("thingy cannot be null");
-
-        selectedThingy = thingy;
-        wantToBeConnected = true;
 
         boolean networkExists = false;
         List<WifiConfiguration> networks = wifiManager.getConfiguredNetworks();
@@ -196,14 +193,17 @@ public class ThingyMcConfig {
             networkId = wifiManager.addNetwork(wifiConfiguration);
             if (networkId == -1) {
                 Log.d(TAG, "failed to add network configuration");
+                return false;
             }
         }
 
+        selectedThingy = thingy;
+        wantToBeConnected = true;
         wifiManager.enableNetwork(networkId, true);
 
         checkIfConnected();
 
-        return false;
+        return true;
     }
 
     public void disconnectFromThingy() {
@@ -213,9 +213,9 @@ public class ThingyMcConfig {
         networkId = -1;
     }
 
-    public List<ScanResponse.ThingyScanResult> scan() throws IOException {
+    public ScanResponse scan() throws IOException {
         Response<ScanResponse> response = service.scan().execute();
-        return response.body().scanresults;
+        return response.body();
     }
 
     public ConfigResponse config(String ssid, String password) throws IOException {
@@ -227,5 +227,9 @@ public class ThingyMcConfig {
     public StatusResponse status() throws IOException {
         Response<StatusResponse> response = service.status().execute();
         return response.body();
+    }
+
+    public Thingy getSelectedThingy() {
+        return selectedThingy;
     }
 }

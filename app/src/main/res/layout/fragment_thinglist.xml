@@ -9,16 +9,21 @@
         <variable
             name="viewModel"
             type="jp.thingy.thingymcconfig_android.viewmodel.ThingyListViewModel"/>
-
-        <variable
-            name="listener"
-            type="jp.thingy.thingymcconfig_android.adapter.ThingyAdapter.OnThingySelectedListener"/>
     </data>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/thingies"
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:adapter="@{ThingyAdapter.createAdapter(viewModel.thingies, listener)}"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+        app:onRefreshListener="@{viewModel}"
+        app:refreshing="@{viewModel.refreshing}">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/thingies"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:adapter="@{ThingyAdapter.createAdapter(viewModel.thingies, viewModel)}"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
 </layout>

@@ -8,10 +8,6 @@
         <variable
             name="viewModel"
             type="jp.thingy.thingymcconfig_android.viewmodel.ConfigurationViewModel"/>
-
-        <variable
-            name="listener"
-            type="jp.thingy.thingymcconfig_android.fragment.ConfigurationFragment.Listener"/>
     </data>
 
     <LinearLayout
@@ -30,7 +26,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> listener.selectNetwork()}"
+            android:onClick="@{() -> viewModel.selectNetwork()}"
             android:paddingBottom="@dimen/margin"
             android:paddingTop="@dimen/margin"
             android:text="Select Network"/>
@@ -76,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:enabled="@{viewModel.configuration.configurable}"
-            android:onClick="@{() -> listener.onConfigure()}"
+            android:onClick="@{() -> viewModel.onConfigure()}"
             android:text="@string/configure"/>
     </LinearLayout>
 </layout>

@@ -3,42 +3,45 @@ package jp.thingy.thingymcconfig_android.viewmodel;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import jp.thingy.jpthingythingymcconfig_androidrx.RxThingyMcConfig;
 import jp.thingy.thingymcconfig.model.StatusResponse;
 import jp.thingy.thingymcconfig_android.BR;
 
 public class ConfigProgressViewModel extends RxThingyViewModel {
 
-    public String ssid, password;
-
+    public final PublishSubject<Boolean> publishSubject = PublishSubject.create();
     public final Progress progress = new Progress();
 
     public ConfigProgressViewModel() {
         super();
-        Observable.merge(thingyMcConfig.events
-                .filter(event -> event == RxThingyMcConfig.Event.CONNECTED)
-                .flatMap(event -> Observable.just(-1)), Observable.interval(10, TimeUnit.SECONDS))
-                .flatMap(i -> Observable.just(thingyMcConfig.status()))
+        thingyMcConfig.listenForEvent(RxThingyMcConfig.Event.CONFIGURING)
+                .flatMap(e ->
+                        Observable.merge(thingyMcConfig.listenForEvent(RxThingyMcConfig.Event.CONNECTED).flatMap(event -> Observable.just(-1)),
+                                Observable.interval(10, TimeUnit.SECONDS)).flatMap(i -> thingyMcConfig.rxStatus())
+                )
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(r -> {
-
-                    if (r.network.config_state == StatusResponse.Network.ConfigState.UNCONFIGURED) {
-                        thingyMcConfig.config(ssid, password);
-                    }
-
                     progress.updateFrom(r);
                 }, e -> {
-                    if (e instanceof IOException) {
-                        e.printStackTrace();
-                        return;
-                    }
                     throw new RuntimeException(e);
                 });
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        publishSubject.onComplete();
+    }
+
+    public void onFinish() {
+        publishSubject.onNext(true);
     }
 
     public enum Status {
