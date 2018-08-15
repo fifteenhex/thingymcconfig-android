@@ -31,7 +31,7 @@ public class ConfigurationFragment extends ViewModelFragment<FragmentConfigurati
 
     @Override
     protected ConfigurationViewModel instantiateViewModel() {
-        return ViewModelProviders.of(this.getActivity()).get(ConfigurationViewModel.class);
+        return ViewModelProviders.of(getActivity()).get(ConfigurationViewModel.class);
     }
 
     @Nullable

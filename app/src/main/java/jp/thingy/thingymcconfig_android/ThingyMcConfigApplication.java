@@ -7,11 +7,9 @@ import javax.inject.Singleton;
 import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
-import jp.thingy.thingymcconfig.ThingyMcConfig;
+import jp.thingy.jpthingythingymcconfig_androidrx.RxThingyMcConfig;
 import jp.thingy.thingymcconfig_android.activity.MainActivity;
-import jp.thingy.thingymcconfig_android.viewmodel.ConfigProgressViewModel;
-import jp.thingy.thingymcconfig_android.viewmodel.ConfigurationViewModel;
-import jp.thingy.thingymcconfig_android.viewmodel.NetworkSelectViewModel;
+import jp.thingy.thingymcconfig_android.viewmodel.RxThingyViewModel;
 
 public class ThingyMcConfigApplication extends Application {
 
@@ -20,15 +18,15 @@ public class ThingyMcConfigApplication extends Application {
     @Module
     public static class AppModule {
 
-        private final ThingyMcConfig thingyMcConfig;
+        private final RxThingyMcConfig thingyMcConfig;
 
-        public AppModule(ThingyMcConfig thingyMcConfig) {
+        public AppModule(RxThingyMcConfig thingyMcConfig) {
             this.thingyMcConfig = thingyMcConfig;
         }
 
         @Provides
         @Singleton
-        ThingyMcConfig thingyMcConfig() {
+        RxThingyMcConfig thingyMcConfig() {
             return thingyMcConfig;
         }
     }
@@ -38,17 +36,13 @@ public class ThingyMcConfigApplication extends Application {
     public interface AppComponent {
         void inject(MainActivity activity);
 
-        void inject(NetworkSelectViewModel viewModel);
-
-        void inject(ConfigurationViewModel viewModel);
-
-        void inject(ConfigProgressViewModel viewModel);
+        void inject(RxThingyViewModel viewModel);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        ThingyMcConfig thingyMcConfig = new ThingyMcConfig(this, "thingy");
+        RxThingyMcConfig thingyMcConfig = new RxThingyMcConfig(this, "thingy");
         component = DaggerThingyMcConfigApplication_AppComponent.builder()
                 .appModule(new AppModule(thingyMcConfig))
                 .build();

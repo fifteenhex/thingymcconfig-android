@@ -8,6 +8,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,11 +35,37 @@ public class ThingyMcConfig {
     private final WifiManager wifiManager;
     private final String ssidPrefix;
     private final ThingyMcConfigService service;
+    private final Callback callback;
     private boolean wantToBeConnected;
     private Thingy selectedThingy;
     private int networkId;
+
+    private Handler handler;
     private IntentFilter wifiStateChangeIntentFilter =
             new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+    private IntentFilter scanResultsIntentFilter =
+            new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+
+    public interface Callback {
+        void onConnectedToSelectedThingy();
+
+        void onScanResults();
+    }
+
+    private void checkIfConnected() {
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (selectedThingy != null) {
+            if (TextUtils.equals(selectedThingy.bssid, wifiInfo.getBSSID())) {
+                Log.d(TAG, String.format("Connected to selected thingy"));
+                if (callback != null)
+                    callback.onConnectedToSelectedThingy();
+            } else {
+                if (wantToBeConnected) {
+                    wifiManager.enableNetwork(networkId, true);
+                }
+            }
+        }
+    }
 
     private BroadcastReceiver wifiStateChangeReceiver = new BroadcastReceiver() {
         @Override
@@ -47,18 +74,35 @@ public class ThingyMcConfig {
             if (wifiInfo != null) {
                 Log.d(TAG, String.format("Connected to %s(%s)", wifiInfo.getSSID(),
                         wifiInfo.getBSSID()));
+                checkIfConnected();
             }
         }
     };
+
+    private BroadcastReceiver scanResultsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (callback != null)
+                callback.onScanResults();
+        }
+    };
+
+    private void scheduleWifiScan(long when) {
+        handler.postDelayed(() -> {
+            wifiManager.startScan();
+        }, when);
+    }
 
     /**
      * @param context
      * @param ssidPrefix
      */
-    public ThingyMcConfig(Context context, String ssidPrefix) {
+    public ThingyMcConfig(Context context, String ssidPrefix, Callback callback) {
+        handler = new Handler();
         wifiManager = (WifiManager) context.getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
         this.ssidPrefix = ssidPrefix;
+        this.callback = callback;
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://10.0.0.1:1338")
@@ -68,6 +112,9 @@ public class ThingyMcConfig {
         service = retrofit.create(ThingyMcConfigService.class);
 
         context.registerReceiver(wifiStateChangeReceiver, wifiStateChangeIntentFilter);
+        context.registerReceiver(scanResultsReceiver, scanResultsIntentFilter);
+
+        scheduleWifiScan(10 * 1000);
     }
 
     private String wrapString(String ssid) {
@@ -153,6 +200,8 @@ public class ThingyMcConfig {
         }
 
         wifiManager.enableNetwork(networkId, true);
+
+        checkIfConnected();
 
         return false;
     }

@@ -3,11 +3,16 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 27
 
+
+
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
@@ -21,6 +26,6 @@ android {
 
 dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
+    api project(':thingymcconfig')
 }

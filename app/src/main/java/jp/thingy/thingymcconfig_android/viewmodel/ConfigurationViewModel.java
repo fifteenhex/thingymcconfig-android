@@ -1,26 +1,18 @@
 package jp.thingy.thingymcconfig_android.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 
-import javax.inject.Inject;
-
-import jp.thingy.thingymcconfig.ThingyMcConfig;
 import jp.thingy.thingymcconfig.model.Thingy;
 import jp.thingy.thingymcconfig_android.BR;
-import jp.thingy.thingymcconfig_android.ThingyMcConfigApplication;
 
-public class ConfigurationViewModel extends ViewModel {
+public class ConfigurationViewModel extends RxThingyViewModel {
 
     public final Configuration configuration = new Configuration();
     public Thingy thingy;
 
-    @Inject
-    public ThingyMcConfig thingyMcConfig;
-
     public ConfigurationViewModel() {
-        ThingyMcConfigApplication.getComponent().inject(this);
+        super();
     }
 
     public static class Configuration extends BaseObservable {

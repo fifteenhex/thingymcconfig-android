@@ -14,7 +14,7 @@ public class NetworkSelectFragment extends ViewModelFragment<FragmentNetworksele
 
     @Override
     protected NetworkSelectViewModel instantiateViewModel() {
-        return ViewModelProviders.of(this).get(NetworkSelectViewModel.class);
+        return ViewModelProviders.of(getActivity()).get(NetworkSelectViewModel.class);
     }
 
     public static NetworkSelectFragment newInstance() {

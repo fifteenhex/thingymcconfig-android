@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 
 import jp.thingy.thingymcconfig.model.ScanResponse;
 import jp.thingy.thingymcconfig_android.R;
+import jp.thingy.thingymcconfig_android.adapter.ThingyScanResultAdapter;
 import jp.thingy.thingymcconfig_android.databinding.ViewholderThingyscanresultBinding;
 
 public class ThingyScanResultViewHolder extends DataBindingViewHolder<ViewholderThingyscanresultBinding> {
@@ -21,7 +22,9 @@ public class ThingyScanResultViewHolder extends DataBindingViewHolder<Viewholder
         return new ThingyScanResultViewHolder(binding);
     }
 
-    public void bind(ScanResponse.ThingyScanResult scanResult) {
+    public void bind(ScanResponse.ThingyScanResult scanResult,
+                     ThingyScanResultAdapter.OnThingyScanResultSelectedListener listener) {
         binding.setScanResult(scanResult);
+        binding.setListener(listener);
     }
 }

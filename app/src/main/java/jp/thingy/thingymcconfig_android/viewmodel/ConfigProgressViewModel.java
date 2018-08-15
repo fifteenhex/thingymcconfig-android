@@ -1,33 +1,28 @@
 package jp.thingy.thingymcconfig_android.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import jp.thingy.thingymcconfig.ThingyMcConfig;
+import jp.thingy.jpthingythingymcconfig_androidrx.RxThingyMcConfig;
 import jp.thingy.thingymcconfig.model.StatusResponse;
 import jp.thingy.thingymcconfig_android.BR;
-import jp.thingy.thingymcconfig_android.ThingyMcConfigApplication;
 
-public class ConfigProgressViewModel extends ViewModel {
+public class ConfigProgressViewModel extends RxThingyViewModel {
 
     public String ssid, password;
 
     public final Progress progress = new Progress();
-    @Inject
-    ThingyMcConfig thingyMcConfig;
 
     public ConfigProgressViewModel() {
-        ThingyMcConfigApplication.getComponent().inject(this);
-
-        Observable.interval(10, TimeUnit.SECONDS)
+        super();
+        Observable.merge(thingyMcConfig.events
+                .filter(event -> event == RxThingyMcConfig.Event.CONNECTED)
+                .flatMap(event -> Observable.just(-1)), Observable.interval(10, TimeUnit.SECONDS))
                 .flatMap(i -> Observable.just(thingyMcConfig.status()))
                 .subscribeOn(Schedulers.io())
                 .subscribe(r -> {

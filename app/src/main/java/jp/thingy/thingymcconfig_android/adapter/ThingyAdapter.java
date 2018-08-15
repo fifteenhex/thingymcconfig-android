@@ -17,6 +17,11 @@ public class ThingyAdapter extends ObservableArrayListAdapter<Thingy, ThingyView
         this.listener = listener;
     }
 
+    public static ThingyAdapter createAdapter(ObservableArrayList<Thingy> thingies,
+                                              OnThingySelectedListener listener) {
+        return new ThingyAdapter(thingies, listener);
+    }
+
     @NonNull
     @Override
     public ThingyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -26,11 +31,6 @@ public class ThingyAdapter extends ObservableArrayListAdapter<Thingy, ThingyView
     @Override
     public void onBindViewHolder(@NonNull ThingyViewHolder holder, int position) {
         holder.bind(list.get(position), listener);
-    }
-
-    public static ThingyAdapter createAdapter(ObservableArrayList<Thingy> thingies,
-                                              OnThingySelectedListener listener) {
-        return new ThingyAdapter(thingies, listener);
     }
 
     public interface OnThingySelectedListener {

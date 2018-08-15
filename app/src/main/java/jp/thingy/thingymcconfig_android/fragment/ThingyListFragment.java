@@ -29,7 +29,7 @@ public class ThingyListFragment extends ViewModelFragment<FragmentThinglistBindi
 
     @Override
     protected ThingyListViewModel instantiateViewModel() {
-        return ViewModelProviders.of(this.getActivity())
+        return ViewModelProviders.of(getActivity())
                 .get(ThingyListViewModel.class);
     }
 
