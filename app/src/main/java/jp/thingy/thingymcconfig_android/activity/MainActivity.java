@@ -74,12 +74,6 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         configurationViewModel.action
-                /*.flatMap(a -> {
-                    if (a == ConfigurationViewModel.Action.CONFIGURE)
-                        thingyMcConfig.config(configurationViewModel.configuration.ssid,
-                                configurationViewModel.configuration.password);
-                    return Observable.just(a);
-                })*/
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(a -> {
@@ -92,6 +86,11 @@ public class MainActivity extends AppCompatActivity {
                                     .commit();
                             break;
                         case CONFIGURE:
+
+                            thingyMcConfig.rxConfig(configurationViewModel.configuration.ssid,
+                                    configurationViewModel.configuration.password)
+                                    .subscribe();
+
                             getSupportFragmentManager()
                                     .beginTransaction()
                                     .addToBackStack(null)
@@ -113,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         configProgressViewModel.publishSubject
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(r -> {
+                    thingyMcConfig.disconnectFromThingy();
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragmentcontainer, ThingyListFragment.newInstance())

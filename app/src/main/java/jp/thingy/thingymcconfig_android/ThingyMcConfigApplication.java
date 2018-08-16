@@ -43,6 +43,7 @@ public class ThingyMcConfigApplication extends Application {
     public void onCreate() {
         super.onCreate();
         RxThingyMcConfig thingyMcConfig = new RxThingyMcConfig(this, "thingy");
+        thingyMcConfig.cleanUp();
         component = DaggerThingyMcConfigApplication_AppComponent.builder()
                 .appModule(new AppModule(thingyMcConfig))
                 .build();

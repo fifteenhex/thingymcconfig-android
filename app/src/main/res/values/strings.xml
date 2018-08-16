@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">ThingyMcConfig</string>
     <string name="configure">Configure</string>
+    <string name="configurationforthingy">Configuration for %s</string>
+    <string name="configtask_sendconfig">Sending configuration...</string>
+    <string name="configtask_supplicant">Waiting for supplicant to connect...</string>
+    <string name="configtask_dhcp4">Waiting for DHCP4 configuration...</string>
 </resources>

@@ -1,8 +1,8 @@
 package jp.thingy.thingymcconfig_android.viewholder;
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
 import jp.thingy.thingymcconfig.model.Thingy;
 import jp.thingy.thingymcconfig_android.R;
@@ -15,10 +15,10 @@ public class ThingyViewHolder extends DataBindingViewHolder<ViewholderThingyBind
         super(binding);
     }
 
-    public static ThingyViewHolder create(Context context) {
+    public static ThingyViewHolder create(ViewGroup parent) {
         ViewholderThingyBinding binding =
-                DataBindingUtil.inflate(LayoutInflater.from(context),
-                        R.layout.viewholder_thingy, null, false);
+                DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+                        R.layout.viewholder_thingy, parent, false);
         return new ThingyViewHolder(binding);
     }
 

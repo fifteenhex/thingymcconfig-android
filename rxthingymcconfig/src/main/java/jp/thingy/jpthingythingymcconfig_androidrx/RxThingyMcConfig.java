@@ -1,6 +1,7 @@
 package jp.thingy.jpthingythingymcconfig_androidrx;
 
 import android.content.Context;
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 
 import io.reactivex.Observable;
@@ -56,22 +57,26 @@ public class RxThingyMcConfig extends ThingyMcConfig {
             return false;
     }
 
+    @CheckResult
     public Observable<ScanResponse> rxScan() {
         return Observable.fromCallable(() -> scan())
                 .subscribeOn(Schedulers.io());
     }
 
+    @CheckResult
     public Observable<StatusResponse> rxStatus() {
         return Observable.fromCallable(() -> status())
                 .subscribeOn(Schedulers.io());
     }
 
+    @CheckResult
     public Observable<ConfigResponse> rxConfig(String ssid, String password) {
         events.onNext(Event.CONFIGURING);
         return Observable.fromCallable(() -> config(ssid, password))
                 .subscribeOn(Schedulers.io());
     }
 
+    @CheckResult
     public Observable<Event> listenForEvent(Event type) {
         return events.filter(event -> event == type);
     }

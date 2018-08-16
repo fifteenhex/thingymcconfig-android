@@ -4,6 +4,8 @@
 
     <data>
 
+        <import type="jp.thingy.thingymcconfig_android.adapter.ConfigurationTaskAdapter"/>
+
         <variable
             name="viewModel"
             type="jp.thingy.thingymcconfig_android.viewmodel.ConfigProgressViewModel"/>
@@ -14,71 +16,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v4.widget.NestedScrollView
+        <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="0dip"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin">
-
-                    <TextView
-                        android:layout_width="0dip"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Sending configuration..."
-                        android:textAppearance="?android:textAppearanceMedium"/>
-
-                    <include
-                        layout="@layout/snippet_configstagestatus"
-                        app:status="@{viewModel.progress.configuration}"/>
-                </LinearLayout>
-
-                <LinearLayout
-
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin">
-
-                    <TextView
-                        android:layout_width="0dip"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Waiting for supplicant to connect..."
-                        android:textAppearance="?android:textAppearanceMedium"/>
-
-                    <include
-                        layout="@layout/snippet_configstagestatus"
-                        app:status="@{viewModel.progress.supplicant}"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="0dip"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Waiting for DHCP4 configuration..."
-                        android:textAppearance="?android:textAppearanceMedium"/>
-
-                    <include
-                        layout="@layout/snippet_configstagestatus"
-                        app:status="@{viewModel.progress.dhcp4}"/>
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </android.support.v4.widget.NestedScrollView>
+            android:layout_weight="1"
+            app:adapter="@{ConfigurationTaskAdapter.createAdapter(viewModel.tasks)}"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
 
         <Button
             android:layout_width="match_parent"

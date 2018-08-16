@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
@@ -61,6 +62,7 @@ public class ThingyMcConfig {
                     callback.onConnectedToSelectedThingy();
             } else {
                 if (wantToBeConnected) {
+                    Log.d(TAG, "want to be connected to thingy but connected to something else.");
                     wifiManager.enableNetwork(networkId, true);
                 }
             }
@@ -93,11 +95,41 @@ public class ThingyMcConfig {
         }, when);
     }
 
+    private static class Prefs {
+        private final static String PREF_STASHEDNETWORKID = "networkid";
+        private final SharedPreferences preferences;
+
+        Prefs(Context context) {
+            preferences = context.getSharedPreferences(this.getClass().getCanonicalName(),
+                    Context.MODE_PRIVATE);
+        }
+
+        public void setStashedNetworkId(int id) {
+            preferences.edit()
+                    .putInt(PREF_STASHEDNETWORKID, id)
+                    .commit();
+        }
+
+        public int getStashedNetworkId() {
+            return preferences.getInt(PREF_STASHEDNETWORKID, -1);
+        }
+
+        public void clearStashedNetworkId() {
+            preferences.edit()
+                    .remove(PREF_STASHEDNETWORKID)
+                    .commit();
+        }
+    }
+
+    private Prefs preferences;
+
     /**
      * @param context
      * @param ssidPrefix
      */
     public ThingyMcConfig(Context context, String ssidPrefix, Callback callback) {
+        preferences = new Prefs(context);
+
         handler = new Handler();
         wifiManager = (WifiManager) context.getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
@@ -197,6 +229,8 @@ public class ThingyMcConfig {
             }
         }
 
+        preferences.setStashedNetworkId(networkId);
+
         selectedThingy = thingy;
         wantToBeConnected = true;
         wifiManager.enableNetwork(networkId, true);
@@ -209,27 +243,35 @@ public class ThingyMcConfig {
     public void disconnectFromThingy() {
         wantToBeConnected = false;
         selectedThingy = null;
-        wifiManager.removeNetwork(networkId);
-        networkId = -1;
+        cleanUp();
     }
 
     public ScanResponse scan() throws IOException {
+        checkIfConnected();
         Response<ScanResponse> response = service.scan().execute();
         return response.body();
     }
 
     public ConfigResponse config(String ssid, String password) throws IOException {
+        checkIfConnected();
         ConfigRequest configRequest = new ConfigRequest(ssid, password);
         Response<ConfigResponse> response = service.config(configRequest).execute();
         return response.body();
     }
 
     public StatusResponse status() throws IOException {
+        checkIfConnected();
         Response<StatusResponse> response = service.status().execute();
         return response.body();
     }
 
     public Thingy getSelectedThingy() {
         return selectedThingy;
+    }
+
+    public void cleanUp() {
+        int networkId = preferences.getStashedNetworkId();
+        wifiManager.removeNetwork(networkId);
+        preferences.clearStashedNetworkId();
     }
 }

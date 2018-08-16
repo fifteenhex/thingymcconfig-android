@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="task"
+            type="jp.thingy.thingymcconfig_android.viewmodel.ConfigProgressViewModel.ConfigurationTask"/>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/margin">
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/margin"
+            android:layout_weight="1"
+            android:text="@{task.formatLabel(context)}"
+            android:textAppearance="?android:textAppearanceMedium"
+            tools:text="Cooking meth..."/>
+
+        <include
+            layout="@layout/snippet_configstagestatus"
+            app:status="@{task.status}"/>
+    </LinearLayout>
+
+</layout>

@@ -14,6 +14,7 @@ public class ConfigurationViewModel extends RxThingyViewModel {
 
     public ConfigurationViewModel() {
         super();
+        registerPublishSubject(action);
     }
 
     public Thingy getThingy() {
@@ -26,12 +27,6 @@ public class ConfigurationViewModel extends RxThingyViewModel {
 
     public void onConfigure() {
         action.onNext(Action.CONFIGURE);
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        action.onComplete();
     }
 
     public enum Action {

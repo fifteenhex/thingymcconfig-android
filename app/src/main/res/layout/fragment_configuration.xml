@@ -19,23 +19,25 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.thingy.ssid}"
-            android:textAppearance="?android:textAppearanceMedium"
-            tools:text="thingy_something"/>
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{@string/configurationforthingy(viewModel.thingy.ssid)}"
+            android:textAppearance="?android:textAppearanceLarge"
+            tools:text="@string/configurationforthingy"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+            android:drawableTint="@color/colorAccent"
             android:onClick="@{() -> viewModel.selectNetwork()}"
             android:paddingBottom="@dimen/margin"
             android:paddingTop="@dimen/margin"
-            android:text="Select Network"/>
+            android:text="Select Network"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@color/colorAccent"/>
 
-        <android.support.v7.widget.AppCompatCheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="@={viewModel.configuration.hiddenSSID}"
-            android:text="Hidden SSID"/>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -48,6 +50,13 @@
                 android:hint="SSID"
                 android:text="@={viewModel.configuration.ssid}"/>
         </android.support.design.widget.TextInputLayout>
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:checked="@={viewModel.configuration.hiddenSSID}"
+            android:text="Hidden SSID"/>
 
 
         <android.support.design.widget.TextInputLayout

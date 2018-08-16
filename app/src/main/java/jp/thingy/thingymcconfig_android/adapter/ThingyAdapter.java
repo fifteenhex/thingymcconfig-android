@@ -25,7 +25,7 @@ public class ThingyAdapter extends ObservableArrayListAdapter<Thingy, ThingyView
     @NonNull
     @Override
     public ThingyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return ThingyViewHolder.create(parent.getContext());
+        return ThingyViewHolder.create(parent);
     }
 
     @Override

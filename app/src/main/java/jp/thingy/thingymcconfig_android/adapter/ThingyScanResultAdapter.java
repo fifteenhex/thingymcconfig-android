@@ -24,7 +24,7 @@ public class ThingyScanResultAdapter extends ObservableArrayListAdapter<ScanResp
     @NonNull
     @Override
     public ThingyScanResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return ThingyScanResultViewHolder.create(parent.getContext());
+        return ThingyScanResultViewHolder.create(parent);
     }
 
     @Override

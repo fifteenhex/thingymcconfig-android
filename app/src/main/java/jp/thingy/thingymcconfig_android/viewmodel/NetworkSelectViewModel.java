@@ -1,73 +1,56 @@
 package jp.thingy.thingymcconfig_android.viewmodel;
 
 import android.databinding.ObservableArrayList;
-import android.databinding.ObservableBoolean;
-import android.support.v4.widget.SwipeRefreshLayout;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.exceptions.Exceptions;
 import io.reactivex.subjects.PublishSubject;
 import jp.thingy.jpthingythingymcconfig_androidrx.RxThingyMcConfig;
 import jp.thingy.thingymcconfig.model.ScanResponse;
 import jp.thingy.thingymcconfig_android.adapter.ThingyScanResultAdapter;
 
 public class NetworkSelectViewModel extends RxThingyViewModel
-        implements ThingyScanResultAdapter.OnThingyScanResultSelectedListener,
-        SwipeRefreshLayout.OnRefreshListener {
-
-    private static final String TAG = NetworkSelectViewModel.class.getSimpleName();
-
-    private Disposable scanDisposable;
-    private final PublishSubject<Integer> refresh = PublishSubject.create();
+        implements ThingyScanResultAdapter.OnThingyScanResultSelectedListener {
 
     public final PublishSubject<ScanResponse.ThingyScanResult> selectedScanResult =
             PublishSubject.create();
     public ObservableArrayList<ScanResponse.ThingyScanResult> scanResults = new ObservableArrayList<>();
-    public ObservableBoolean refreshing = new ObservableBoolean();
 
     public NetworkSelectViewModel() {
         super();
-        scanDisposable =
-                thingyMcConfig.listenForEvent(RxThingyMcConfig.Event.SELECTED)
-                        .flatMap(e -> Observable.merge(Observable.interval(0, 30, TimeUnit.SECONDS), refresh))
-                        .flatMap(i -> thingyMcConfig.rxScan())
-                        .flatMap(scanResults -> Observable
-                                .fromIterable(scanResults.scanresults))
-                        .doOnError(t -> {
-                            if (t instanceof IOException) {
-                                t.printStackTrace();
-                            } else
-                                throw Exceptions.propagate(t);
-                        })
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(sr -> {
-                            scanResults.add(sr);
-                            refreshing.set(false);
-                        }, e -> {
-                            throw new RuntimeException(e);
-                        });
-    }
+        registerPublishSubject(selectedScanResult);
+        registerPublishSubject(refresh);
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        scanDisposable.dispose();
-        selectedScanResult.onComplete();
-        refresh.onComplete();
+        registerDisposable(thingyMcConfig.listenForEvent(RxThingyMcConfig.Event.SELECTED)
+                .flatMap(e -> Observable.merge(Observable.interval(0, 30,
+                        TimeUnit.SECONDS), refresh))
+                .toFlowable(BackpressureStrategy.DROP)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(i -> {
+                    registerDisposable(thingyMcConfig.rxScan()
+                            .flatMap(scanResults -> Observable
+                                    .fromIterable(scanResults.scanresults))
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .doOnSubscribe(c -> {
+                                refreshing.set(true);
+                            })
+                            .doOnTerminate(() -> {
+                                refreshing.set(false);
+                            })
+                            .subscribe(sr -> {
+                                if (!scanResults.contains(sr))
+                                    scanResults.add(sr);
+                            }, t -> {
+                                handleMaskableExceptions(t);
+                            }));
+                }));
     }
 
     @Override
     public void onThingyScanResultSelected(ScanResponse.ThingyScanResult scanResult) {
         selectedScanResult.onNext(scanResult);
-    }
-
-    @Override
-    public void onRefresh() {
-        refresh.onNext(-2);
     }
 }
